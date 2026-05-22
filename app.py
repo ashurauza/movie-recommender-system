@@ -47,16 +47,25 @@ def create_movie_poster(title):
         overlay = Image.new('RGB', (500, 50), color=(255, 255, 255))
         img.paste(overlay, (0, i), Image.new('L', (500, 50), int(50 * (i / 750))))
     
-    # Try to load large fonts
+    # Helper function to load cross-platform fonts
+    def load_font(size):
+        """Load a cross-platform font"""
+        font_paths = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",  # Linux (Streamlit Cloud)
+            "/System/Library/Fonts/Helvetica.ttc",  # macOS
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",  # Linux fallback
+            "/Windows/Fonts/arial.ttf",  # Windows
+        ]
+        for path in font_paths:
+            try:
+                return ImageFont.truetype(path, size)
+            except:
+                continue
+        return ImageFont.load_default()
+    
+    # Load initial font
     font_size = 60
-    font = None
-    try:
-        font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", font_size)
-    except:
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
+    font = load_font(font_size)
     
     title_lines = []
     words = title.split()
@@ -75,25 +84,28 @@ def create_movie_poster(title):
     if current_line:
         title_lines.append(current_line)
     
+    def load_font(size):
+        """Load a cross-platform font"""
+        font_paths = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            "/Windows/Fonts/arial.ttf",
+        ]
+        for path in font_paths:
+            try:
+                return ImageFont.truetype(path, size)
+            except:
+                continue
+        return ImageFont.load_default()
+    
     if len(title_lines) > 2 or any(len(line) > 15 for line in title_lines):
         font_size = 45
-        try:
-            font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", font_size)
-        except:
-            try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
-            except:
-                pass
+        font = load_font(font_size)
     
     if len(title_lines) > 3:
         font_size = 32
-        try:
-            font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", font_size)
-        except:
-            try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
-            except:
-                pass
+        font = load_font(font_size)
     
     line_height = font_size + 12
     total_height = len(title_lines) * line_height
