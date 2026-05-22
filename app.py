@@ -116,11 +116,25 @@ def create_movie_poster(title):
     
     start_y = max(top_margin, start_y)
     
-    outline_range = 1
+    # Add dark semi-transparent background for text area
+    text_bg_top = start_y - 30
+    text_bg_bottom = start_y + total_height + 30
+    # Create overlay for better text contrast
+    overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    overlay_draw.rectangle(
+        [(30, text_bg_top), (470, text_bg_bottom)],
+        fill=(0, 0, 0, 140)  # Dark semi-transparent background
+    )
+    img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
+    draw = ImageDraw.Draw(img)
+    
+    # Draw text with stronger outline for better visibility
+    outline_range = 3
     for i, line in enumerate(title_lines):
         y_position = start_y + (i * line_height)
         
-        # Draw text outline
+        # Draw text outline with thicker border
         for adj_x in range(-outline_range, outline_range + 1):
             for adj_y in range(-outline_range, outline_range + 1):
                 if adj_x != 0 or adj_y != 0:
@@ -132,6 +146,7 @@ def create_movie_poster(title):
                         font=font
                     )
         
+        # Draw bright white text on top
         draw.text(
             (250, y_position),
             line,
